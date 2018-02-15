@@ -21,34 +21,27 @@ sys.path.append('/home/pi/mercury/libreria')
 from Adafruit_PWM_Servo_Driver import PWM
 
 """----------------------------CONTROL DE LOS PINES GPIO------------------------------"""
+#Colocamos los pines GPIO en modo BCM
 GPIO.setmode(GPIO.BCM)
 
 
 """------------LOS PINES PARA EL CONTROL DE LOS MOTORES TODOS SON GPIO BCM------------"""
-#Definimos el pin 27 GPIO BCM donde se encontrara el motord in1
+#Definimos el pin 4 GPIO BCM donde se encontrara el motord in1
 motord_in1 = 4
 #Colocamos el pin del motord in1 como salida
 GPIO.setup(motord_in1, GPIO.OUT)
-#Definimos el pin 22 GPIO BCM donde se encontrara el motord in2
+#Definimos el pin 17 GPIO BCM donde se encontrara el motord in2
 motord_in2 = 17
 #Colocamos el pin del motord in2 como salida
 GPIO.setup(motord_in2, GPIO.OUT)
-#Definimos el pin 24 GPIO BCM donde se encontrara el motori in1
+#Definimos el pin 18 GPIO BCM donde se encontrara el motori in1
 motori_in1 = 18
 #Colocamos el pin del motori in1 como salida
 GPIO.setup(motori_in1, GPIO.OUT)
-#Definimos el pin 25 GPIO BCM donde se encontrara el motori in2
+#Definimos el pin 27 GPIO BCM donde se encontrara el motori in2
 motori_in2 = 27
 #Colocamos el pin del motori in2 como salida
 GPIO.setup(motori_in2, GPIO.OUT)
-##Definimos el pin 4 GPIO BCM donde se encontrara el pwm del motor 1
-#motorpwm1 = 22
-##Colocamos el pin del pwm1 como pwm
-#GPIO.setFunction(motorpwm1, GPIO.PWM)
-##Definimos el pin 18 GPIO BCM donde se encontrara el pwm del motor 2
-#motorpwm2 = 23
-##Colocamos el pin del pwm2 como pwm
-#GPIO.setFunction(motorpwm2, GPIO.PWM)
 
 
 """-------------------------------SWICHEO DE MOTORES----------------------------------"""
@@ -76,10 +69,6 @@ def stop():
 	GPIO.output(motord_in2, 0)
 	GPIO.output(motori_in1, 0)
 	GPIO.output(motori_in2, 0)
-	#Se declara a la variable velocidad como global
-	global velocidad
-	#Se define como 0 inicialmente
-	velocidad = 0
 
 
 def derecha():
@@ -99,15 +88,33 @@ def izquierda():
 
 
 """--------------------------ACELERACIÓN DE LOS MOTORES-------------------------------"""
+#Se inicia la fución pwm en la ruta 0 de I2C que sería 0x40 pero con una x
+xpwm = PWM(0x40)
+#Se establece la frecuencia a 1000 Hz
+frecuencia = 1000
+#Debido a tener una frecuencia de 1000Hz, el periodo es de 1ms
+#periodo = 0.001
+#Colocamos los pulsos del pwm al valor de la frecuencia
+xpwm.setPWMFreq(frecuencia)
+#t_tick = 0.000000244140625
 
 
-def acelerar(valor_vel):
+def acelerar(tick):
 	"""Controla la velocidad de los motores"""
-	global velocidad
-	velocidad = valor_vel
-	#value = float(velocidad) / 100
-	#GPIO.pulseRatio(motorpwm1, value)
-	#GPIO.pulseRatio(motorpwm2, value)
+	#Toma el valor recibido del deslizador en la página respecto a la aceleración
+	#Convierte ese valor de String a entero
+	tick = int(tick)
+	#Aplicamos esta ecuación por comodidad, debido a que en la página aparecerá de
+	#0 a 100 que sería en porcentaje, pero aquí se ajusta al tick
+	x = tick * 4095 / 100
+	#Debido a que pueden surgir números flotantes, se debe convertir a entero este valor
+	x = int(x)
+	print ("El valor del servo es: " + str(x))
+	#Colocamos el servo del canal 2, iniciando con alto hasta el valor del tick
+	#La función hace lo siguiente |¨¨¨¨¨¨¨|______|¨¨¨¨¨¨¨|______
+	#Esta función tiene como parámetro el canal, valor de on y off
+	#Es decir, se enciende en 0 y se apaga en el tiempo del tick
+	pwm.setPWM(2, 0, x)
 
 
 """--------------------------CONTROL DE LOS SERVOMOTORES------------------------------"""
@@ -116,7 +123,7 @@ pwm = PWM(0x40)
 #Se establece la frecuencia a 50 Hz
 freq = 50
 #Debido a tener una frecuencia de 50Hz, el periodo es de 20ms
-periodo = 0.020
+#periodo = 0.020
 #Colocamos los pulsos del pwm al valor de la frecuencia
 pwm.setPWMFreq(freq)
 
@@ -159,8 +166,8 @@ estadoluz = "apagado"
 
 def linterna():
 	"""Controla la tira led que funcionará de linterna en el túnel"""
-	#Si el estado de la luz es apagado
 	global estadoluz
+	#Si el estado de la luz es apagado
 	if(estadoluz == "apagado"):
 		#Enciende la tira led
 		GPIO.output(led, 1)
@@ -183,41 +190,50 @@ def internet():
 	Y si no hay internet ejecuta la función stop"""
 	global tira_led
 	global infinito
+	#Mientras que la variable infinito sea True
 	while infinito:
+		#Hace un ping a google
 		w = subprocess.Popen(["ping", "-c 1", "www.google.com"], stdout=subprocess.PIPE)
 		w.wait()
+		#Si da error el ping
 		if w.poll():
+			#Coloca la variable tira_led en False
 			tira_led = False
+			#Para los motores
 			stop()
 			print ("No hay internet")
+			#Llama a la función linterna
 			linterna()
 			time.sleep(1)
+		#Si el ping es correcto
 		else:
 			print ("Si hay internet")
+			#Pone la tira_led en True
 			tira_led = True
 			time.sleep(1)
 
 
 """-------------TIRA LED PARA DECORACIÓN Y SEÑAL DE PÉRDIDA DE INTERNET---------------"""
-#Definimos el pin 24 xGPIO board el cual controlará el color rojo de la tira led
+#Definimos el pin 25 el cual controlará el color rojo de la tira led
 tira_rojo = 25
 #Colocamos el pin del led rojo como salida
 GPIO.setup(tira_rojo, GPIO.OUT)
-#Definimos el pin 24 xGPIO board el cual controlrá el color verde de la tira led
+#Definimos el pin 10 el cual controlrá el color verde de la tira led
 tira_verde = 10
 #Colocamos el pin del led verde como salida
 GPIO.setup(tira_verde, GPIO.OUT)
-#Definimos el pin 24 xGPIO board el cual controlará el color azul de la tira led
+#Definimos el pin 9 el cual controlará el color azul de la tira led
 tira_azul = 9
 #Colocamos el pin del led azul como salida
 GPIO.setup(tira_azul, GPIO.OUT)
+#Guardamos el ciclo de colores en RGB que seguirá la tira
 colores = ("000", "011", "001", "101", "100", "110", "010")
 #Variable que controla el ciclo infinito de la vizualización de la tira led
 tira_led = True
 
 
 def color(R, G, B):
-	"""Color"""
+	"""Enciende la tira led el color que se especifique"""
 	GPIO.output(tira_rojo, R)
 	GPIO.output(tira_verde, G)
 	GPIO.output(tira_azul, B)
@@ -225,12 +241,13 @@ def color(R, G, B):
 
 def whitru():
 	"""Ejecuta el ciclo infinito para la visualización de la tira led"""
-	print ("Tira Ok")
 	global tira_led
 	global infinito
-	#Mientras que el valor de la tira led sea verdadero
+	#Recorre cada posición del vector colores
 	for todo in colores:
+		#Imprime cada valor
 		print ((todo[0], todo[1], todo[2]))
+		#Llama a la función color e ilumino cada sección según su color especifico
 		color(int(todo[0]), int(todo[1]), int(todo[2]))
 		time.sleep(2)
 		if (tira_led is False):
@@ -240,16 +257,14 @@ def whitru():
 
 
 def whifalse():
-	"""No se"""
-	print("Tira NOOOOO")
+	"""Función que muestra la tira led en rojo y parpadea cuando no hay internet"""
+	#Enciende el rojo y apaga los otros colores
 	GPIO.output(tira_rojo, 0)
 	GPIO.output(tira_verde, 1)
 	GPIO.output(tira_azul, 1)
-	#Espera 0.5 segundos
 	time.sleep(1)
-	#Apga el color rojo
+	#Apaga el rojo
 	GPIO.output(tira_rojo, 1)
-	#Espera 0.5 segundos
 	time.sleep(1)
 
 
@@ -258,11 +273,11 @@ def tira():
 	#Mientras que la variable tira_led sea True
 	global tira_led
 	global infinito
+	#Mientras que la variable infinito sea True
 	while infinito:
 		if (tira_led is True):
 			whitru()
 		if (tira_led is False):
-			print("Tira False")
 			whifalse()
 
 
