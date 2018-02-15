@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport"
+		content="height = device-height, width = 420, user-scalable = no">
+		<title>MAGBOTICS</title>
+		<script type="text/javascript" src="/webiopi.js"></script>
+		<script type="text/javascript">
+			function init() {
+			}
+			function Stop() {
+				webiopi().callMacro("BotonStop");
+			}
+			function servo1() {
+				webiopi().callMacro("servo1",ageOutputId.value);
+			}
+			function servo2() {
+				webiopi().callMacro("servo2",ageOutputId2.value);
+			}
+			function Aceleracion() {
+				webiopi().callMacro("Aceleracion",ageOutputId3.value);
+			}
+			function Adelante() {
+				webiopi().callMacro("BotonAdelante");
+			}
+			function Reversa() {
+				webiopi().callMacro("BotonReversa");
+			}
+			function Izquierda() {
+				webiopi().callMacro("BotonIzquierda");
+			}
+			function Derecha() {
+				webiopi().callMacro("BotonDerecha");
+			}
+			function luz() {
+				webiopi().callMacro("luz");
+			}
+			webiopi().ready(init);
+		</script>
+		<link href="css/estilos.css" rel="stylesheet" type="text/css">
+	</head>
+	<div id="tabla">
+		<div id="traccion">
+			<div id="arriba"><button class="boton" type="button"
+				ontouchstart="Adelante()" ontouchend="Stop()">Avanzar</button>
+			</div>
+			<div id="medio">
+				<div id="izquierda"><button class="boton" type="button"
+					ontouchstart="Izquierda()" ontouchend="Stop()">Izquierda</button>
+				</div>
+				<div id="centro"><button class="botonrojo" type="button"
+					ontouchstart="luz()">LUZ</button>
+				</div>
+				<div id="derecha"><button class="boton" type="button"
+					ontouchstart="Derecha()" ontouchend="Stop()">Derecha</button>
+				</div>
+			</div>
+			<div id="abajo"><button class="boton" type="button"
+				ontouchstart="Reversa()" ontouchend="Stop()" >Reversa</button>
+			</div>
+		</div>
+	</div>
+	<div id="servos">
+		<div id="horizontal">
+			<form name="registrationForm">
+				<p>Servo 1</p>
+				<input type="range" name="ageInputName" id="ageInputId"
+				value="30" min="13" max="50" step="1"
+				oninput="ageOutputId.value = ageInputId.value" ontouchmove="servo1()">
+				<p></p>
+				<p></p>
+				<output name="ageOutputName" id="ageOutputId">30</output>
+			</form>
+			<form name="registrationForm2">
+				<p>Servo 2</p>
+				<input type="range" name="ageInputName2" id="ageInputId2"
+				value="30" min="16" max="45" step="1"
+				oninput="ageOutputId2.value = ageInputId2.value" ontouchmove="servo2()">
+				<p></p>
+				<p></p>
+				<output name="ageOutputName2" id="ageOutputId2">30</output>
+			</form>
+			<form name="registrationForm3">
+				<input type="range" name="ageInputName3" id="ageInputId3"
+				value="20.0" min="0.0" max="50.0" step="0.5"
+				oninput="ageOutputId3.value = ageInputId3.value" ontouchmove="Aceleracion()">
+				<p></p>
+				<p></p>
+				<output name="ageOutputName3" id="ageOutputId3">20.0</output>
+			</form>
+		</div>
+		</div>
+</html>
