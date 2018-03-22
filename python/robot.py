@@ -49,18 +49,18 @@ GPIO.setup(motori_in2, GPIO.OUT)
 
 def reversa():
 	"""El robot se moverá hacia atras, en reversa"""
-	GPIO.output(motord_in1, 1)
-	GPIO.output(motord_in2, 0)
-	GPIO.output(motori_in1, 0)
-	GPIO.output(motori_in2, 1)
-
-
-def adelante():
-	"""El robot se moverá hacia adelante"""
 	GPIO.output(motord_in1, 0)
 	GPIO.output(motord_in2, 1)
 	GPIO.output(motori_in1, 1)
 	GPIO.output(motori_in2, 0)
+
+
+def adelante():
+	"""El robot se moverá hacia adelante"""
+	GPIO.output(motord_in1, 1)
+	GPIO.output(motord_in2, 0)
+	GPIO.output(motori_in1, 0)
+	GPIO.output(motori_in2, 1)
 
 
 def stop():
@@ -88,33 +88,28 @@ def izquierda():
 
 
 """--------------------------ACELERACIÓN DE LOS MOTORES-------------------------------"""
-#Se inicia la fución pwm en la ruta 0 de I2C que sería 0x40 pero con una x
-xpwm = PWM(0x40)
-#Se establece la frecuencia a 1000 Hz
-frecuencia = 1000
-#Debido a tener una frecuencia de 1000Hz, el periodo es de 1ms
-#periodo = 0.001
-#Colocamos los pulsos del pwm al valor de la frecuencia
-xpwm.setPWMFreq(frecuencia)
-#t_tick = 0.000000244140625
+motor_pwm = 15
+GPIO.setup(motor_pwm, GPIO.OUT)
+#Ponemos el pin 36 como salida
+pwm_motor = GPIO.PWM(motor_pwm, 1000)
+#Ponemos el pin 36 en modo PWM y enviamos 50 pulsos por segundo
+pwm_motor.start(50)
+
+xmotor_pwm = 14
+GPIO.setup(xmotor_pwm, GPIO.OUT)
+#Ponemos el pin 36 como salida
+xpwm_motor = GPIO.PWM(xmotor_pwm, 1000)
+#Ponemos el pin 36 en modo PWM y enviamos 50 pulsos por segundo
+xpwm_motor.start(50)
 
 
-def acelerar(tick):
+def acelerar(tickx):
 	"""Controla la velocidad de los motores"""
 	#Toma el valor recibido del deslizador en la página respecto a la aceleración
 	#Convierte ese valor de String a entero
-	tick = int(tick)
-	#Aplicamos esta ecuación por comodidad, debido a que en la página aparecerá de
-	#0 a 100 que sería en porcentaje, pero aquí se ajusta al tick
-	x = tick * 4095 / 100
-	#Debido a que pueden surgir números flotantes, se debe convertir a entero este valor
-	x = int(x)
-	print ("El valor del servo es: " + str(x))
-	#Colocamos el servo del canal 2, iniciando con alto hasta el valor del tick
-	#La función hace lo siguiente |¨¨¨¨¨¨¨|______|¨¨¨¨¨¨¨|______
-	#Esta función tiene como parámetro el canal, valor de on y off
-	#Es decir, se enciende en 0 y se apaga en el tiempo del tick
-	pwm.setPWM(2, 0, x)
+	tx = int(tickx)
+	pwm_motor.ChangeDutyCycle(tx)
+	xpwm_motor.ChangeDutyCycle(tx)
 
 
 """--------------------------CONTROL DE LOS SERVOMOTORES------------------------------"""
@@ -128,22 +123,83 @@ freq = 50
 pwm.setPWMFreq(freq)
 
 
-def servo01(tick):
-	"""Controla el primer servomotor, este tiene un rango entre 130 y 500 ticks"""
+def conftick(angulo, mini, maxi):
+	"""Funcion tick"""
+	periodo = 0.020
+	print (periodo)
+	t_tick = periodo / 4096 * 1000000
+	print (t_tick)
+	tick_min = mini / t_tick
+	print (tick_min)
+	tick_max = maxi / t_tick
+	print (tick_max)
+	m = (tick_max - tick_min) / 180
+	print (m)
+	tick = m * angulo + tick_min
+	print (tick)
+	return (tick)
+
+
+def hombro(angulo):
+	"""Controla el primer servomotor, este tiene un rango entre HS425BB 553-2520μsec"""
 	#Toma el valor recibido del deslizador en la página respecto al servo 1
 	#Convierte ese valor de String a entero
-	tick = int(tick)
+	angulo = int(angulo)
+	u_min = 553
+	u_max = 2520
+	tick = conftick(angulo, u_min, u_max)
 	#Para comodidad, en la página el deslizador va de 13 a 50, por eso se multiplica * 10
-	tick = tick * 10
-	print ("El valor del servo es: " + str(tick))
+	print ("El valor del servo es: " + str(int(tick)))
 	#Colocamos el servo del canal 0, iniciando con alto hasta el valor del tick
 	#La función hace lo siguiente |¨¨¨¨¨¨¨|______|¨¨¨¨¨¨¨|______
 	#Esta función tiene como parámetro el canal, valor de on y off
 	#Es decir, se enciende en 0 y se apaga en el tiempo del tick
-	pwm.setPWM(0, 0, tick)
+	pwm.setPWM(0, 0, int(tick))
 
 
-def servo02(tick):
+def codo(angulo):
+	"""Controla el segundo servomotor, este tiene un rango entre 160 y 450 ticks"""
+	#Toma el valor recibido del deslizador en la página respecto al servo 2
+	#Convierte ese valor de String a entero
+	angulo = int(angulo)
+	u_min = 553
+	u_max = 2450
+	tick = conftick(angulo, u_min, u_max)
+	#Para comodidad, en la página el deslizador va de 13 a 50, por eso se multiplica * 10
+	print ("El valor del servo es: " + str(int(tick)))
+	#Colocamos el servo del canal 1, iniciando con alto hasta el valor del tick
+	pwm.setPWM(1, 0, int(tick))
+
+
+def muneca(angulo):
+	"""Controla el segundo servomotor, este tiene un rango entre 160 y 450 ticks"""
+	#Toma el valor recibido del deslizador en la página respecto al servo 2
+	#Convierte ese valor de String a entero
+	angulo = int(angulo)
+	u_min = 750
+	u_max = 2250
+	tick = conftick(angulo, u_min, u_max)
+	#Para comodidad, en la página el deslizador va de 13 a 50, por eso se multiplica * 10
+	print ("El valor del servo es: " + str(int(tick)))
+	#Colocamos el servo del canal 1, iniciando con alto hasta el valor del tick
+	pwm.setPWM(2, 0, int(tick))
+
+
+def pinza(angulo):
+	"""Controla el segundo servomotor, este tiene un rango entre 160 y 450 ticks"""
+	#Toma el valor recibido del deslizador en la página respecto al servo 2
+	#Convierte ese valor de String a entero
+	angulo = int(angulo)
+	u_min = 750
+	u_max = 2250
+	tick = conftick(angulo, u_min, u_max)
+	#Para comodidad, en la página el deslizador va de 13 a 50, por eso se multiplica * 10
+	print ("El valor del servo es: " + str(int(tick)))
+	#Colocamos el servo del canal 1, iniciando con alto hasta el valor del tick
+	pwm.setPWM(3, 0, int(tick))
+
+
+def celular(tick):
 	"""Controla el segundo servomotor, este tiene un rango entre 160 y 450 ticks"""
 	#Toma el valor recibido del deslizador en la página respecto al servo 2
 	#Convierte ese valor de String a entero
@@ -152,8 +208,14 @@ def servo02(tick):
 	tick = tick * 10
 	print ("El valor del servo es: " + str(tick))
 	#Colocamos el servo del canal 1, iniciando con alto hasta el valor del tick
-	pwm.setPWM(1, 0, tick)
+	pwm.setPWM(4, 0, tick)
 
+
+def recoger():
+	"""Recoge"""
+	hombro(103)
+	codo(147)
+	muneca(30)
 
 """---------------------SWICHEO DE LUZ LED PARA CRUZAR EL TÚNEL-----------------------"""
 #Definimos el pin 24 donde se encontrara el led que servirá de linterna
@@ -333,17 +395,38 @@ def BotonIzquierda():
 
 
 @webiopi.macro
-def servo1(valor):
+def Hombro(valor):
 	"""Función que recibe los datos del deslizador de la página web del movimiento del servo
 	y ejecuta la función servo01"""
-	servo01(valor)
+	hombro(valor)
 
 
 @webiopi.macro
-def servo2(valor):
+def Codo(valor):
 	"""Función que recibe los datos del deslizador de la página web del movimiento del servo
 	y ejecuta la función servo02"""
-	servo02(valor)
+	codo(valor)
+
+
+@webiopi.macro
+def Muneca(valor):
+	"""Función que recibe los datos del deslizador de la página web del movimiento del servo
+	y ejecuta la función servo01"""
+	muneca(valor)
+
+
+@webiopi.macro
+def Pinza(valor):
+	"""Función que recibe los datos del deslizador de la página web del movimiento del servo
+	y ejecuta la función servo02"""
+	pinza(valor)
+
+
+@webiopi.macro
+def Celular(valor):
+	"""Función que recibe los datos del deslizador de la página web del movimiento del servo
+	y ejecuta la función servo02"""
+	celular(valor)
 
 
 @webiopi.macro
@@ -359,6 +442,12 @@ def luz():
 	y ejecuta la función linterna"""
 	linterna()
 
+
+@webiopi.macro
+def Recoger():
+	"""Función que recibe los datos del botón de luz de la página web
+	y ejecuta la función linterna"""
+	recoger()
 
 """---------------------------DESTRUYE LAS VARIABLES USADAS---------------------------"""
 

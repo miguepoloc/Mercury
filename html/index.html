@@ -1,95 +1,344 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<meta name="viewport"
-		content="height = device-height, width = 420, user-scalable = no">
-		<title>MAGBOTICS</title>
-		<script type="text/javascript" src="/webiopi.js"></script>
-		<script type="text/javascript">
-			function init() {
-			}
-			function Stop() {
-				webiopi().callMacro("BotonStop");
-			}
-			function servo1() {
-				webiopi().callMacro("servo1",ageOutputId.value);
-			}
-			function servo2() {
-				webiopi().callMacro("servo2",ageOutputId2.value);
-			}
-			function Aceleracion() {
-				webiopi().callMacro("Aceleracion",ageOutputId3.value);
-			}
-			function Adelante() {
-				webiopi().callMacro("BotonAdelante");
-			}
-			function Reversa() {
-				webiopi().callMacro("BotonReversa");
-			}
-			function Izquierda() {
-				webiopi().callMacro("BotonIzquierda");
-			}
-			function Derecha() {
-				webiopi().callMacro("BotonDerecha");
-			}
-			function luz() {
-				webiopi().callMacro("luz");
-			}
-			webiopi().ready(init);
-		</script>
-		<link href="css/estilos.css" rel="stylesheet" type="text/css">
-	</head>
-	<div id="tabla">
-		<div id="traccion">
-			<div id="arriba"><button class="boton" type="button"
-				ontouchstart="Adelante()" ontouchend="Stop()">Avanzar</button>
-			</div>
-			<div id="medio">
-				<div id="izquierda"><button class="boton" type="button"
-					ontouchstart="Izquierda()" ontouchend="Stop()">Izquierda</button>
-				</div>
-				<div id="centro"><button class="botonrojo" type="button"
-					ontouchstart="luz()">LUZ</button>
-				</div>
-				<div id="derecha"><button class="boton" type="button"
-					ontouchstart="Derecha()" ontouchend="Stop()">Derecha</button>
-				</div>
-			</div>
-			<div id="abajo"><button class="boton" type="button"
-				ontouchstart="Reversa()" ontouchend="Stop()" >Reversa</button>
-			</div>
-		</div>
-	</div>
-	<div id="servos">
-		<div id="horizontal">
-			<form name="registrationForm">
-				<p>Servo 1</p>
-				<input type="range" name="ageInputName" id="ageInputId"
-				value="30" min="13" max="50" step="1"
-				oninput="ageOutputId.value = ageInputId.value" ontouchmove="servo1()">
-				<p></p>
-				<p></p>
-				<output name="ageOutputName" id="ageOutputId">30</output>
-			</form>
-			<form name="registrationForm2">
-				<p>Servo 2</p>
-				<input type="range" name="ageInputName2" id="ageInputId2"
-				value="30" min="16" max="45" step="1"
-				oninput="ageOutputId2.value = ageInputId2.value" ontouchmove="servo2()">
-				<p></p>
-				<p></p>
-				<output name="ageOutputName2" id="ageOutputId2">30</output>
-			</form>
-			<form name="registrationForm3">
-				<p>Velocidad</p>
-				<input type="range" name="ageInputName3" id="ageInputId3"
-				value="50" min="0" max="100" step="1"
-				oninput="ageOutputId3.value = ageInputId3.value" ontouchmove="Aceleracion()">
-				<p></p>
-				<p></p>
-				<output name="ageOutputName3" id="ageOutputId3">50</output>
-			</form>
-		</div>
-		</div>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="height = device-height, width = device-width, user-scalable = no">
+    <title>MAGBOTICS</title>
+    <script type="text/javascript" src="/webiopi.js"></script>
+    <script type="text/javascript">
+        function init() {}
+
+        function Stop() {
+            webiopi().callMacro("BotonStop");
+        }
+
+
+        function Aceleracion() {
+            webiopi().callMacro("Aceleracion", control_acout.value);
+        }
+
+        function Adelante() {
+            webiopi().callMacro("BotonAdelante");
+        }
+
+        function Reversa() {
+            webiopi().callMacro("BotonReversa");
+        }
+
+        function Izquierda() {
+            webiopi().callMacro("BotonIzquierda");
+        }
+
+        function Derecha() {
+            webiopi().callMacro("BotonDerecha");
+        }
+
+        function luz() {
+            webiopi().callMacro("luz");
+        }
+
+        function Recoger() {
+            webiopi().callMacro("Recoger");
+        }
+
+        var s1 = 90;
+
+        function mas_servo1() {
+            if (s1 < 180) {
+                s1 = s1 + 1;
+                document.getElementById("n_servo1").innerHTML = "Hombro ".concat(s1);
+                webiopi().callMacro("Hombro", s1);
+            }
+        }
+
+        function menos_servo1() {
+            if (0 < s1) {
+                s1 = s1 - 1;
+                document.getElementById("n_servo1").innerHTML = "Hombro ".concat(s1);
+                webiopi().callMacro("Hombro", s1);
+            }
+        }
+
+        var s2 = 90;
+
+        function mas_servo2() {
+            if (s2 < 180) {
+            	s2 = s2 + 1;
+                document.getElementById("n_servo2").innerHTML = "Codo ".concat(s2);
+                webiopi().callMacro("Codo", s2);
+            }
+        }
+
+        function menos_servo2() {
+            if (0 < s2) {
+            	s2 = s2 - 1;
+                document.getElementById("n_servo2").innerHTML = "Codo ".concat(s2);
+                webiopi().callMacro("Codo", s2);
+            }
+        }
+
+        var s3 = 90;
+
+        function mas_servo3() {
+            if (s3 < 180) {
+            	s3 = s3 + 1;
+                document.getElementById("n_servo3").innerHTML = "Muñeca ".concat(s3);
+                webiopi().callMacro("Muneca", s3);
+            }
+        }
+
+        function menos_servo3() {
+            if (0 < s3) {
+            	s3 = s3 - 1;
+                document.getElementById("n_servo3").innerHTML = "Muñeca ".concat(s3);
+                webiopi().callMacro("Muneca", s3);
+            }
+        }
+
+        var s4 = 90;
+
+        function mas_servo4() {
+            if (s4 < 180) {
+            	s4 = s4 + 1;
+                document.getElementById("n_servo4").innerHTML = "Pinza ".concat(s4);
+                webiopi().callMacro("Pinza", s4);
+            }
+        }
+
+        function menos_servo4() {
+            if (0 < s4) {
+            	s4 = s4 - 1;
+                document.getElementById("n_servo4").innerHTML = "Pinza ".concat(s4);
+                webiopi().callMacro("Pinza", s4);
+            }
+        }
+
+        var s5 = 30;
+
+        function mas_servo5() {
+            if (s5 < 51) {
+            	s5 = s5 + 1;
+                document.getElementById("n_servo5").innerHTML = "Celular ".concat(s5);
+                webiopi().callMacro("Celular", s5);
+            }
+        }
+
+        function menos_servo5() {
+            if (12 < s5) {
+            	s5 = s5 - 1;
+                document.getElementById("n_servo5").innerHTML = "Celular ".concat(s5);
+                webiopi().callMacro("Celular", s5);
+            }
+        }
+
+        var a = 50;
+
+        function mas_aceleracion() {
+            if (a < 100) {
+            	a = a + 1;
+                document.getElementById("n_a").innerHTML = "Velocidad ".concat(a);
+                webiopi().callMacro("Aceleracion", a);
+            }
+        }
+
+        function menos_aceleracion() {
+            if (0 < a) {
+            	a = a - 1;
+                document.getElementById("n_a").innerHTML = "Velocidad ".concat(a);
+                webiopi().callMacro("Aceleracion", a);
+            }
+        }
+
+        function Mostrar1() {
+            var x = document.getElementById("ver1");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+            Mostrar2();
+            Mostrar3();
+            Mostrar4()
+        }
+
+        function Mostrar2() {
+            var x = document.getElementById("ver2");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        function Mostrar3() {
+            var x = document.getElementById("ver3");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        function Mostrar4() {
+            var x = document.getElementById("ver4");
+            var y = document.getElementById("oculto");
+            var z = document.getElementById("normalx");
+            var q = document.getElementById("cambio");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+                y.style.display = "none";
+                z.style.display = "none";
+                q.innerHTML = "Ocultar"
+            } else {
+                x.style.display = "none";
+                y.style.display = "block";
+                z.style.display = "block";
+                q.innerHTML = "Mostrar"
+            }
+        }
+
+        function Ocultado() {
+            var x = document.getElementById("oculto");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        webiopi().ready(init);
+
+    </script>
+    <link href="css/estilos.css" rel="stylesheet" type="text/css">
+</head>
+
+<div id="traccion">
+    <div id="arriba">
+        <div id="izquierda">
+            <button class="botonrojo" type="button" ontouchstart="Mostrar1()" id="cambio">Ocultar</button>
+        </div>
+        <div id="centro">
+            <button class="boton" type="button" ontouchstart="Adelante()" ontouchend="Stop()">Avanzar</button>
+        </div>
+        <div id="derecha">
+            <button class="botonservos" type="button" ontouchstart="Deposito()" id="ver1">Depósito</button>
+        </div>
+    </div>
+    <br><br><br>
+    <div id="medio">
+        <div id="izquierda">
+            <button class="boton" type="button" ontouchstart="Izquierda()" ontouchend="Stop()">Izquierda</button>
+        </div>
+        <div id="centro">
+            <button class="botonnegro" type="button" ontouchstart="luz()">LUZ</button>
+        </div>
+        <div id="derecha">
+            <button class="boton" type="button" ontouchstart="Derecha()" ontouchend="Stop()">Derecha</button>
+        </div>
+    </div>
+    <div id="abajo">
+        <div id="izquierda">
+            <button class="numero" type="button" ontouchstart="Deposito()" id="oculto" style="display: none;"></button>
+        </div>
+        <div id="izquierda">
+            <button class="botonservos" type="button" ontouchstart="Recoger()" id="ver3">Recoger</button>
+        </div>
+        <div id="centro">
+            <button class="boton" type="button" ontouchstart="Reversa()" ontouchend="Stop()">Reversa</button>
+        </div>
+        <div id="derecha">
+            <button class="botonservos" type="button" ontouchstart="Deposito()" id="ver4">Empujar</button>
+        </div>
+    </div>
+</div>
+<br><br><br><br><br><br>
+<div id="ver2">
+    <div id="servos">
+        <div id="izquierda">
+            <button class="boton" type="button" ontouchstart="menos_servo1()" ontouchend="Stop()">-</button>
+        </div>
+        <div id="centro">
+            <button class="numero" type="button"><p class="valorx" id="n_servo1">Hombro 90</p></button>
+        </div>
+        <div id="derecha">
+            <button class="boton" type="button" ontouchstart="mas_servo1()" ontouchend="Stop()">+</button>
+        </div>
+    </div>
+
+    <div id="servos">
+        <div id="izquierda">
+            <button class="boton" type="button" ontouchstart="menos_servo2()">-</button>
+        </div>
+        <div id="centro">
+            <button class="numero" type="button"><p class="valorx" id="n_servo2">Codo 30</p></button>
+        </div>
+        <div id="derecha">
+            <button class="boton" type="button" ontouchstart="mas_servo2()">+</button>
+        </div>
+    </div>
+
+    <div id="servos">
+        <div id="izquierda">
+            <button class="boton" type="button" ontouchstart="menos_servo3()">-</button>
+        </div>
+        <div id="centro">
+            <button class="numero" type="button"><p class="valorx" id="n_servo3">Muñeca 30</p></button>
+        </div>
+        <div id="derecha">
+            <button class="boton" type="button" ontouchstart="mas_servo3()">+</button>
+        </div>
+    </div>
+
+    <div id="servos">
+        <div id="izquierda">
+            <button class="boton" type="button" ontouchstart="menos_servo4()">-</button>
+        </div>
+        <div id="centro">
+            <button class="numero" type="button"><p class="valorx" id="n_servo4">Pinza 30</p></button>
+        </div>
+        <div id="derecha">
+            <button class="boton" type="button" ontouchstart="mas_servo4()">+</button>
+        </div>
+    </div>
+
+    <div id="servos">
+        <div id="izquierda">
+            <button class="boton" type="button" ontouchstart="menos_servo5()">-</button>
+        </div>
+        <div id="centro">
+            <button class="numero" type="button"><p class="valorx" id="n_servo5">Celular 30</p></button>
+        </div>
+        <div id="derecha">
+            <button class="boton" type="button" ontouchstart="mas_servo5()">+</button>
+        </div>
+    </div>
+</div>
+<!--
+<div id="velocidad">
+    <div id="izquierda">
+        <button class="boton_menos" type="button" ontouchstart="menos_aceleracion()">-</button>
+    </div>
+    <div id="centro">
+        <button class="numero" type="button"><p class="valorx" id="n_a">Velocidad 50</p></button>
+    </div>
+    <div id="derecha">
+        <button class="boton_mas" type="button" ontouchstart="mas_aceleracion()">+</button>
+    </div>
+</div>
+-->
+
+<div id="servxs">
+<form name="velocimetro">
+    <input type="range" name="control_in" id="control_acin" value="50" min="0" max="100" step="1"
+    oninput="control_acout.value = control_acin.value" ontouchmove="Aceleracion()">
+    <output name="control_out" id="control_acout" style="text-align: center;">50</output>
+</form>
+<!--
+<form name="registrationForm3">
+    <input type="range" name="ageInputName3" id="ageInputId3" value="20.0" min="0.0" max="50.0" step="0.5" oninput="ageOutputId3.value = ageInputId3.value" ontouchmove="setacceleration()">
+      <output name="ageOutputName3" id="ageOutputId3">20.0</output>
+</form>
+-->
+</div>
+<button class="boton" type="button" id="normalx" ontouchstart="normal()" style="display: none;">Posición Normal</button>
 </html>
